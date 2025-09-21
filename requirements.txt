@@ -1,0 +1,10 @@
+lask
+gunicorn
+google-cloud-firestore
+google-generativeai
+google-cloud-texttospeech
+google-cloud-speech
+requests
+python-dotenv
+sounddevice
+numpy

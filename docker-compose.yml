@@ -1,0 +1,23 @@
+# docker-compose.yml
+services:
+  chatbot:
+    build:
+      context: .
+      dockerfile: chatbot.Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./ttsbot-471404-39e4ea704298.json:/app/ttsbot-471404-39e4ea704298.json
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/ttsbot-471404-39e4ea704298.json
+
+  mcp-server:
+    build:
+      context: .
+      dockerfile: mcp.Dockerfile
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./ttsbot-471404-39e4ea704298.json:/app/ttsbot-471404-39e4ea704298.json
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/ttsbot-471404-39e4ea704298.json

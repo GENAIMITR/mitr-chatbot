@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emotional Chat Bot</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="lucy-theme">
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-robot"></i> MITR</h1>
+      <p class="tagline">Choose a personality and start chatting!</p>
+    </header>
+
+    <div class="personality-selector">
+      <div class="persona-slider">
+        <div class="persona-option active" data-persona="Lucy" onclick="selectPersona('Lucy')">
+          <div class="persona-icon">💖</div>
+          <div class="persona-name">Lucy</div>
+        </div>
+        <div class="persona-option" data-persona="Suzanne" onclick="selectPersona('Suzanne')">
+          <div class="persona-icon">😂</div>
+          <div class="persona-name">Suzanne</div>
+        </div>
+        <div class="persona-option" data-persona="Lexi" onclick="selectPersona('Lexi')">
+          <div class="persona-icon">🧠</div>
+          <div class="persona-name">Lexi</div>
+        </div>
+        <div class="persona-option" data-persona="Roxy" onclick="selectPersona('Roxy')">
+          <div class="persona-icon">🔥</div>
+          <div class="persona-name">Roxy</div>
+        </div>
+      </div>
+      <div class="persona-description" id="persona-description">
+        Gentle, sweet, comforting 💖
+      </div>
+    </div>
+
+    <div class="mode-toggle">
+      <button class="mode-btn active-mode" id="text-mode-btn" onclick="setMode('text')">
+        <i class="fas fa-keyboard"></i> Text Mode
+      </button>
+      <button class="mode-btn" id="voice-mode-btn" onclick="setMode('voice')">
+        <i class="fas fa-microphone"></i> Voice Mode
+      </button>
+      <button class="mode-btn" id="session-history-btn" onclick="showSessionHistory()">
+        <i class="fas fa-history"></i> Session History
+      </button>
+      
+    </div>
+
+    <div class="chat-container">
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="input-area">
+        <input type="text" id="user-input" placeholder="Type your message here...">
+        <button id="send-btn" onclick="sendMessage()">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+        <button id="mic-btn" onclick="toggleRecording()">
+          <i class="fas fa-microphone"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
