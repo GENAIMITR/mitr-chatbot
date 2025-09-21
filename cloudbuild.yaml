@@ -45,3 +45,12 @@ steps:
   - '--set-env-vars=MCP_SERVER_URL=https://mcp-server-392336272460.us-central1.run.app'
   - '--region=us-central1'
   - '--memory=2Gi'
+
+# Tell Cloud Build which images to expect in the end
+images:
+- 'us-central1-docker.pkg.dev/$PROJECT_ID/chatbot-repo/mcp-server:latest'
+- 'us-central1-docker.pkg.dev/$PROJECT_ID/chatbot-repo/chatbot:latest'
+
+# Set the logging option to fix the error
+options:
+  logging: CLOUD_LOGGING_ONLY
