@@ -1,0 +1,11 @@
+# cloudbuild.yaml
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/chatbot-repo/mcp-server:latest', '-f', 'mcp.Dockerfile', '.']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/chatbot-repo/chatbot:latest', '-f', 'chatbot.Dockerfile', '.']
+
+images:
+- 'us-central1-docker.pkg.dev/$PROJECT_ID/chatbot-repo/mcp-server:latest'
+- 'us-central1-docker.pkg.dev/$PROJECT_ID/chatbot-repo/chatbot:latest'

@@ -6,7 +6,21 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
 import google.generativeai as genai
 from google.cloud import speech, texttospeech
+import google.auth.transport.requests
+import google.oauth2.id_token
 
+def get_auth_header(target_audience):
+    """
+    Makes a request to the metadata server to get an identity token.
+    This token is used to authenticate requests to other Cloud Run services.
+    """
+    try:
+        auth_req = google.auth.transport.requests.Request()
+        id_token = google.oauth2.id_token.fetch_id_token(auth_req, target_audience)
+        return {"Authorization": f"Bearer {id_token}"}
+    except Exception as e:
+        print(f"Error fetching identity token: {e}")
+        return {}
 # -----------------------------
 # CONFIG
 # -----------------------------
@@ -34,9 +48,10 @@ personality_styles = {
 # -----------------------------
 def add_message(persona, session_id, speaker, text):
     try:
+        headers = get_auth_header(MCP_SERVER_URL)
         response = requests.post(f"{MCP_SERVER_URL}/mcp/add_message", json={
             "persona": persona, "session_id": session_id, "speaker": speaker, "text": text
-        })
+        }, headers=headers)
         if response.status_code != 200:
             return response.json()
         return response.json()
@@ -45,9 +60,10 @@ def add_message(persona, session_id, speaker, text):
 
 def get_messages(persona, session_id, limit=50):
     try:
+        headers = get_auth_header(MCP_SERVER_URL)
         response = requests.post(f"{MCP_SERVER_URL}/mcp/get_messages", json={
             "persona": persona, "session_id": session_id, "limit": limit
-        })
+        }, headers=headers)
         response.raise_for_status()
         return response.json().get("result", [])
     except Exception as e:
@@ -56,13 +72,15 @@ def get_messages(persona, session_id, limit=50):
 
 def clear_history(persona, session_id):
     try:
-        requests.post(f"{MCP_SERVER_URL}/mcp/clear_history", json={"persona": persona, "session_id": session_id})
+        headers = get_auth_header(MCP_SERVER_URL)
+        requests.post(f"{MCP_SERVER_URL}/mcp/clear_history", json={"persona": persona, "session_id": session_id}, headers=headers)
     except Exception as e:
         print(f"Error calling MCP for clear_history: {e}")
 
 def get_sessions(persona):
     try:
-        response = requests.post(f"{MCP_SERVER_URL}/mcp/get_sessions", json={"persona": persona})
+        headers = get_auth_header(MCP_SERVER_URL)
+        response = requests.post(f"{MCP_SERVER_URL}/mcp/get_sessions", json={"persona": persona}, headers=headers)
         response.raise_for_status()
         return response.json().get("result", [])
     except Exception as e:
@@ -71,13 +89,15 @@ def get_sessions(persona):
 
 def add_persona_memory(persona, text):
     try:
-        requests.post(f"{MCP_SERVER_URL}/mcp/add_persona_memory", json={"persona": persona, "text": text})
+        headers = get_auth_header(MCP_SERVER_URL)
+        requests.post(f"{MCP_SERVER_URL}/mcp/add_persona_memory", json={"persona": persona, "text": text}, headers=headers)
     except Exception as e:
         print(f"Error calling MCP for add_persona_memory: {e}")
 
 def get_persona_memory(persona, limit=10):
     try:
-        response = requests.post(f"{MCP_SERVER_URL}/mcp/get_persona_memory", json={"persona": persona, "limit": limit})
+        headers = get_auth_header(MCP_SERVER_URL)
+        response = requests.post(f"{MCP_SERVER_URL}/mcp/get_persona_memory", json={"persona": persona, "limit": limit}, headers=headers)
         response.raise_for_status()
         return response.json().get("result", "")
     except Exception as e:

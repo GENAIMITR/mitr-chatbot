@@ -1,4 +1,4 @@
-lask
+flask
 gunicorn
 google-cloud-firestore
 google-generativeai
