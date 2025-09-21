@@ -1,11 +1,47 @@
 # cloudbuild.yaml
 steps:
+# Step 1: Build the mcp-server image
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/chatbot-repo/mcp-server:latest', '-f', 'mcp.Dockerfile', '.']
 
+# Step 2: Build the chatbot image
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/chatbot-repo/chatbot:latest', '-f', 'chatbot.Dockerfile', '.']
 
-images:
-- 'us-central1-docker.pkg.dev/$PROJECT_ID/chatbot-repo/mcp-server:latest'
-- 'us-central1-docker.pkg.dev/$PROJECT_ID/chatbot-repo/chatbot:latest'
+# Step 3: Push both images to Artifact Registry
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/chatbot-repo/mcp-server:latest']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/chatbot-repo/chatbot:latest']
+
+# Step 4: Deploy the mcp-server service
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+  - 'run'
+  - 'deploy'
+  - 'mcp-server'
+  - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/chatbot-repo/mcp-server:latest'
+  - '--port=8081'
+  - '--no-allow-unauthenticated'
+  - '--remove-secrets=GOOGLE_APPLICATION_CREDENTIALS'
+  - '--region=us-central1'
+  - '--memory=1Gi'
+
+# Step 5: Deploy the chatbot service
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+  - 'run'
+  - 'deploy'
+  - 'chatbot'
+  - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/chatbot-repo/chatbot:latest'
+  - '--port=8080'
+  - '--allow-unauthenticated'
+  - '--service-account=mitr-chatbot-sa@$PROJECT_ID.iam.gserviceaccount.com'
+  - '--remove-secrets=GOOGLE_APPLICATION_CREDENTIALS'
+  - '--update-secrets=GEMINI_API_KEY=gemini-api-key:latest'
+  - '--set-env-vars=MCP_SERVER_URL=https://mcp-server-392336272460.us-central1.run.app'
+  - '--region=us-central1'
+  - '--memory=2Gi'
